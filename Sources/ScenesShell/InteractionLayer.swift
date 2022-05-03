@@ -8,13 +8,9 @@ import Igis
 
 
 class InteractionLayer : Layer {
-    let player = Player(startingRect: Rect(size: Size(width:128, height: 128)))
-    let gamevars = GameVariables()
+    let player = Player(startingRect: Rect(size: Size(width:64, height: 64)))
+    var gamevars = GameVariables()
     var platforms = [Platform]()
-    
-    for _ in 0..<10 {
-        platforms.append(Platform())
-    }
     
     static var instance: InteractionLayer? = nil
     
@@ -27,9 +23,10 @@ class InteractionLayer : Layer {
         // We insert our RenderableEntities in the constructor
         insert(entity: player, at: .front)
 
-        for platform in platforms {
+        for index in 0..<5 {
+            let platform = Platform(id: index)
+            platforms.append(platform)
             insert(entity: platform, at: .front)
-            platform.spawnPlatform()
         }
-      }
+    }
 }

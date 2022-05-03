@@ -19,10 +19,16 @@ class Player: RenderableEntity, MouseMoveHandler {
     }
 
     override func calculate(canvasSize: Size) {
+        var gameInfo = InteractionLayer.instance?.gamevars
         let canvasHitbox = Rect(size:canvasSize)
         let playerContainment = canvasHitbox.containment(target: playerHitbox.rect)
         if !playerContainment.intersection([.overlapsBottom, .beyondBottom]).isEmpty {
-            playerVelocity = -15
+            if InteractionLayer.instance?.gamevars.gameHeight == 0 {
+                playerVelocity = -20
+            } else {
+                print("YOU LOSER LOLOLOLOLOLOLOL")
+                playerVelocity = -20
+            }
         } else if playerVelocity < 10 {
             playerVelocity += 1
         }
@@ -31,18 +37,41 @@ class Player: RenderableEntity, MouseMoveHandler {
         let playerCenter = playerPosition.x + Int(playerHitbox.rect.size.width / 2)
 
         if playerCenter - 10 > cursorLocation.x {
-            playerPosition.x -= 10
-        } else if playerCenter + 10 < cursorLocation.x {
-            playerPosition.x += 10
+            playerPosition.x -= 20
+        } else if playerCenter + 20 < cursorLocation.x {
+            playerPosition.x += 20
+        }
+        
+        let platforms = InteractionLayer.instance?.platforms
+        for selection in platforms! {
+            let platformContainment = selection.platform.rect.containment(target: playerHitbox.rect)
+
+            if !platformContainment.intersection([.contact]).isEmpty &&
+                 !platformContainment.intersection([.overlapsTop]).isEmpty {
+                playerVelocity = -20
+            }
         }
 
-        playerPosition.y += playerVelocity
+        if playerPosition.y > canvasSize.height / 2 || playerVelocity > 0 {
+            playerPosition.y += playerVelocity
+        } else {
+            for selection in platforms! {
+                selection.platform.rect.topLeft.y -= playerVelocity
+            }
+            InteractionLayer.instance?.gamevars.gameHeight -= playerVelocity
+        }
+
+        if gameInfo!.platformQueue.isEmpty != true{
+            InteractionLayer.instance?.platforms[gameInfo!.platformQueue[0]].spawnPlatform(reset: true)
+            InteractionLayer.instance?.platforms[gameInfo!.platformQueue[0]].debounce = false
+            InteractionLayer.instance?.gamevars.platformQueue.removeFirst()
+        }
         playerHitbox.rect.topLeft = playerPosition
     }
 
     override func setup(canvasSize: Size, canvas: Canvas) {
-        InteractionLayer.instance?.game.helloWorld()
-        playerHitbox.rect.topLeft = canvasSize.center
+        playerHitbox.rect.topLeft.x = canvasSize.center.x
+        playerHitbox.rect.topLeft.y = canvasSize.height
         self.canvasSize = canvasSize
         
         dispatcher.registerMouseMoveHandler(handler:self)
