@@ -20,7 +20,7 @@ class Platform: RenderableEntity {
     func spawnPlatform(reset: Bool = false) {
         let currentHeight = InteractionLayer.instance?.gamevars.gameHeight
         platformType = Int.random(in: (currentHeight! - 2000) / 500 ... currentHeight! / 500)
-        let position = Int.random(in: 0 ... windowSize.width - platform.rect.size.width)
+        let position = Int.random(in: windowSize.center.x - 450 ... windowSize.center.x + 450)
 
         if platformType > 1 {
             platformType = 1

@@ -1,0 +1,12 @@
+import Scenes
+import Igis
+
+class Menu: RenderableEntity {
+    init() {
+        super.init(name:"Menu")
+    }
+
+    func gameOver() {
+        
+    }
+}

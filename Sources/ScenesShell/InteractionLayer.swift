@@ -11,6 +11,8 @@ class InteractionLayer : Layer {
     let player = Player(startingRect: Rect(size: Size(width:64, height: 64)))
     var gamevars = GameVariables()
     var platforms = [Platform]()
+    let fallingEnemy = Enemy(startingRect: Rect(size: Size(width:128, height: 128)))
+    let interface = Interface()
     
     static var instance: InteractionLayer? = nil
     
@@ -21,6 +23,7 @@ class InteractionLayer : Layer {
         InteractionLayer.instance = self
 
         // We insert our RenderableEntities in the constructor
+        insert(entity: interface, at: .front)
         insert(entity: player, at: .front)
 
         for index in 0..<5 {
@@ -28,5 +31,7 @@ class InteractionLayer : Layer {
             platforms.append(platform)
             insert(entity: platform, at: .front)
         }
+
+        insert(entity: fallingEnemy, at: .front)
     }
 }
