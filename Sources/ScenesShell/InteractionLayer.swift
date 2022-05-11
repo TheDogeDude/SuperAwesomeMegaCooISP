@@ -13,7 +13,8 @@ class InteractionLayer : Layer {
     var platforms = [Platform]()
     let fallingEnemy = Enemy(startingRect: Rect(size: Size(width:128, height: 128)))
     let interface = Interface()
-    
+
+    // Allow children of Interactionlayer access to other children within Interactionlayer
     static var instance: InteractionLayer? = nil
     
     init() {
@@ -26,7 +27,8 @@ class InteractionLayer : Layer {
         insert(entity: interface, at: .front)
         insert(entity: player, at: .front)
 
-        for index in 0..<5 {
+        // Insert 10 platforms and assign them IDs
+        for index in 0..<10 {
             let platform = Platform(id: index)
             platforms.append(platform)
             insert(entity: platform, at: .front)

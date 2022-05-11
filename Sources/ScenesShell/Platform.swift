@@ -14,20 +14,35 @@ class Platform: RenderableEntity {
     init(id: Int) {
         super.init(name: "Platform")
         self.id = id
-        platform.rect.topLeft.y = id * 180
     }
     
     func spawnPlatform(reset: Bool = false) {
         let currentHeight = InteractionLayer.instance?.gamevars.gameHeight
-        platformType = Int.random(in: (currentHeight! - 2000) / 500 ... currentHeight! / 500)
-        let position = Int.random(in: windowSize.center.x - 450 ... windowSize.center.x + 450)
 
+        // Determine the platform type based off of the current height
+        if currentHeight! < 3000 {
+            platformType = 0
+        } else if currentHeight! < 6000 {
+            platformType = Int.random(in: -1 ... 1)
+        } else if currentHeight! < 9000 {
+            platformType = Int.random(in: 0 ... 1)
+        } else if currentHeight! < 12000 {
+            platformType = Int.random(in: 0 ... 2)
+        } else {
+            platformType = 1
+        }
+
+        // Choose a random position within range to spawn the platform
+        let position = Int.random(in: windowSize.center.x - 400 ... windowSize.center.x + 400)
+
+        // Prevent overflow
         if platformType > 1 {
             platformType = 1
         } else if platformType < 0 {
             platformType = 0
         }
-        
+
+        // Set brick color depending on type
         switch (platformType) {
         case 1:
             // Moving brick
@@ -38,42 +53,41 @@ class Platform: RenderableEntity {
             platformColor = FillStyle(color:Color(.white))
             outline = StrokeStyle(color:Color(.black))
         }
-        
+
         platform.rect.topLeft.x = position
 
         if reset {
-            platform.rect.topLeft.y = 0
-        }
-    }
-
-    func despawnPlatform() {
-        if !debounce {
-            InteractionLayer.instance?.gamevars.platformQueue.append(id)
-            debounce = true
+            platform.rect.topLeft.y = -300
         }
     }
     
     override func calculate(canvasSize: Size) {
+        // Create a rect around canvas and create a containment for the platform
         let canvasHitbox = Rect(size:canvasSize)
         let platformContainment = canvasHitbox.containment(target: platform.rect)
-        
+
         switch (platformType) {
-        case 1:
+        case 1: // If the platform type is moving
+            // If platform collides with the wall, then bounce
             if !platformContainment.intersection([.overlapsRight, .beyondRight]).isEmpty ||
                  !platformContainment.intersection([.overlapsLeft, .beyondLeft]).isEmpty  {
                 velocity = -velocity
             }
-            
+
+            // Move the platform
             platform.rect.topLeft.x += velocity
         default: break
         }
 
+        // If the platform reaches the bottom of the screen, reset the platform
         if !platformContainment.intersection([.overlapsBottom, .beyondBottom]).isEmpty {
-            despawnPlatform()
+            spawnPlatform(reset: true)
         }
     }
     
     override func setup(canvasSize: Size, canvas: Canvas) {
+        // Initialize the platform
+        platform.rect.topLeft.y = canvasSize.height - (id * 150)
         windowSize = canvasSize
         
         spawnPlatform()
