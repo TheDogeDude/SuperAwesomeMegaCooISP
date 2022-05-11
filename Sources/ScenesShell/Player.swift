@@ -28,7 +28,7 @@ class Player: RenderableEntity, MouseMoveHandler {
     }
 
     override func calculate(canvasSize: Size) {
-        var gameInfo = InteractionLayer.instance?.gamevars
+        let gameInfo = InteractionLayer.instance?.gamevars
 
         // If the game is active
         if gameInfo!.gameActive {
